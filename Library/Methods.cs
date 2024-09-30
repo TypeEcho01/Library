@@ -9,7 +9,7 @@ using System.Text;
 
 namespace Library
 {
-    public static class Functions
+    public static class Methods
     {
         #region Input/Output
         private static readonly Printer _printer = new();
