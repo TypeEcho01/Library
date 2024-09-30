@@ -11,26 +11,13 @@ namespace Library
 {
     public static class Functions
     {
-        // Attributes
+        #region Input/Output
         private static readonly Printer _printer = new();
-        private static readonly Random _random = new();
 
-        // Print functions
         public static void Print(params object?[] values) => _printer.Print(values);
 
-        public static void ConfigurePrint(string? sep = null, string? end = null, string? file = null)
-        {
-            if (sep is not null)
-                _printer.Sep = sep;
+        public static void ConfigurePrint(string? sep = null, string? end = null, string? file = null) => _printer.Configure(sep, end, file);
 
-            if (end is not null)
-                _printer.End = end;
-
-            if (file is not null)
-                _printer.File = file;
-        }
-
-        // Console functions
         public static string Input()
         {
             string? output = Console.ReadLine();
@@ -47,6 +34,71 @@ namespace Library
             return Input();
         }
 
+        public static T? Input<T>() => Input().To<T>();
+
+        public static T? Input<T>(string prompt) => Input(prompt).To<T>();
+
+        public static T? Input<T>(T defaultValue) => Input().To<T>(defaultValue);
+
+        public static T? Input<T>(string prompt, T defaultValue) => Input(prompt).To<T>(defaultValue);
+
+        public static T? InputLoop<T>()
+        {
+            while (true)
+            {
+                try
+                {
+                    return Input<T>();
+                }
+                catch (InvalidCastException)
+                {
+                    continue;
+                }
+            }
+        }
+
+        public static T? InputLoop<T>(string prompt, bool repeatPrompt = true)
+        {
+            while (true)
+            {
+                if (!repeatPrompt)
+                    Console.Write(prompt);
+
+                try
+                {
+                    if (repeatPrompt)
+                        Console.Write(prompt);
+
+                    return Input<T>();
+                }
+                catch (InvalidCastException)
+                {
+                    continue;
+                }
+            }
+        }
+
+        public static T? InputLoop<T>(string prompt, string failureMessage, bool repeatPrompt = true)
+        {
+            while (true)
+            {
+                if (!repeatPrompt)
+                    Console.Write(prompt);
+
+                try
+                {
+                    if (repeatPrompt)
+                        Console.Write(prompt);
+
+                    return Input<T>();
+                }
+                catch (InvalidCastException)
+                {
+                    Console.WriteLine(failureMessage);
+                }
+            }
+        }
+
         public static void Pause() => Console.ReadKey();
 
         public static void Pause(string message)
@@ -56,64 +108,50 @@ namespace Library
         }
 
         public static void ClearScreen() => Console.Clear();
+        #endregion
 
-        // StringTo functions
-        public static int StringToInt(string value)
+        #region Type casting
+        public static T? To<T>(this object value)
         {
-            if (int.TryParse(value, out int result))
-                return result;
+            if (value is null)
+                return default;
 
-            throw new ArgumentException($"StringToInt(\"{value}\") cannot convert \"{value}\" to int");
+            try
+            {
+                return (T)Convert.ChangeType(value, typeof(T));
+            }
+            catch
+            {
+                throw new InvalidCastException($"Cannot convert {value} to {typeof(T)}.");
+            }
         }
 
-        public static int StringToInt(string value, int failsafe)
+        public static T? To<T>(this object value, T? defaultValue)
         {
-            if (int.TryParse(value, out int result))
-                return result;
+            try
+            {
+                return value.To<T>();
+            }
+            catch (InvalidCastException)
+            {
+                if (defaultValue is not null)
+                    return defaultValue;
 
-            return failsafe;
+                return default;
+            }
         }
+        #endregion
 
-        public static float StringToFloat(string value)
-        {
-            if (float.TryParse(value, out float result))
-                return result;
+        #region Random
+        private static readonly Random _random = new();
 
-            throw new ArgumentException($"StringToFloat(\"{value}\") cannot convert \"{value}\" to float");
-        }
+        public static double RandomDouble() => _random.NextDouble();
 
-        public static float StringToFloat(string value, float failsafe)
-        {
-            if (float.TryParse(value, out float result))
-                return result;
+        public static int RandomRange(int stop) => _random.Next(stop);
 
-            return failsafe;
-        }
+        public static int RandomRange(int start, int stop) => _random.Next(start, stop);
 
-        public static double StringToDouble(string value)
-        {
-            if (double.TryParse(value, out double result))
-                return result;
-
-            throw new ArgumentException($"StringToDouble(\"{value}\") cannot convert \"{value}\" to double");
-        }
-
-        public static double StringToDouble(string value, double failsafe)
-        {
-            if (double.TryParse(value, out double result))
-                return result;
-
-            return failsafe;
-        }
-
-        // Random functions
-        public static double Random() => _random.NextDouble();
-
-        public static int RandRange(int stop) => _random.Next(stop);
-
-        public static int RandRange(int start, int stop) => _random.Next(start, stop);
-
-        public static int RandRange(int start, int stop, int step)
+        public static int RandomRange(int start, int stop, int step)
         {
             if (step <= 0)
                 throw new ArgumentOutOfRangeException(nameof(step), $"Step must be greater than 0, not {step}");
@@ -133,19 +171,36 @@ namespace Library
             return result;
         }
 
-        public static int RandInt(int a, int b) => _random.Next(a, b + 1);
+        public static int RandomInt(int a, int b) => _random.Next(a, b + 1);
 
-        public static double Uniform(int a, int b) => a + _random.NextDouble() * (b - a);
+        public static double RandomUniform(int a, int b) => a + _random.NextDouble() * (b - a);
 
-        public static T Choice<T>(T[] array)
+        public static T RandomChoice<T>(IList<T> collection)
         {
-            if (array is null)
-                throw new ArgumentException("Array cannot be null", nameof(array));
+            if (collection is null)
+                throw new ArgumentException("collection cannot be null.", nameof(collection));
 
-            if (array.Length == 0)
-                throw new ArgumentException("Array cannot be empty", nameof(array));
+            int length = collection.Count;
+            if (length == 0)
+                throw new ArgumentException("collection cannot be empty.", nameof(collection));
 
-            return array[_random.Next(array.Length)];
+            return collection[_random.Next(length)];
         }
+
+        public static void RandomShuffle<T>(IList<T> collection)
+        {
+            if (collection is null)
+                throw new ArgumentNullException(nameof(collection), "collection cannot be null.");
+
+            int length = collection.Count;
+            for (int i = 0; i < (length - 1); i++)
+            {
+                int randomIndex = i + _random.Next(length - i);
+                T temporaryElement = collection[randomIndex];
+                collection[randomIndex] = collection[i];
+                collection[i] = temporaryElement;
+            }
+        }
+        #endregion
     }
 }

@@ -1,16 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
   <Class Name="Library.Printer">
-    <Position X="5.75" Y="0.5" Width="4.25" />
+    <Position X="6.25" Y="0.5" Width="4.75" />
     <TypeIdentifier>
-      <HashCode>AAMAIABAAEQABAAAAAAEgAAAgABEwABAAQAAAAMEAIA=</HashCode>
+      <HashCode>AAMAIABAAEQABAAAAABEgAAAgABEwABAAQAAAAMEAIA=</HashCode>
       <FileName>Printer.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Library.Functions">
-    <Position X="0.5" Y="0.5" Width="5" />
+    <Position X="0.5" Y="0.5" Width="5.5" />
     <TypeIdentifier>
-      <HashCode>AAAgAAAAAAAAAAQRgAAAAABBECAADABAAAAAAAAEAgE=</HashCode>
+      <HashCode>AAAgBAAAAAAAAAAQAAAAAAgAECAKAAhAAIAAAhAEAAE=</HashCode>
       <FileName>Functions.cs</FileName>
     </TypeIdentifier>
   </Class>

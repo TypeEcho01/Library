@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Reflection;
+using System.Text;
 
 namespace Library
 {
@@ -165,6 +166,18 @@ namespace Library
 
             // Write to the set File otherwise
             System.IO.File.AppendAllText(File, value);
+        }
+
+        public void Configure(string? sep = null, string? end = null, string? file = null)
+        {
+            if (sep is not null)
+                Sep = sep;
+
+            if (end is not null)
+                End = end;
+
+            if (file is not null)
+                File = file;
         }
 
         public void Print(params object?[] values)
